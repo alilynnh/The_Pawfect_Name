@@ -1,5 +1,3 @@
-DROP TABLE main CASCADE;
-
 CREATE TABLE main (
 	animal_name VARCHAR, 
 	animal_gender VARCHAR,
@@ -26,6 +24,15 @@ WHERE animal_name NOT IN ('UNKNOWN', 'NAME NOT PROVIDED', 'NONE', '.', '...','N/
 -- determine how many total pets there are with name provided
 SELECT COUNT(*) AS total
 FROM pet_names
+;
+
+-- determine total pets per year
+SELECT 
+	extract_year,
+	COUNT(animal_name) AS total
+INTO yearly_totals
+FROM pet_names
+GROUP BY extract_year
 ;
 
 -- determine number of pets with each unique name
