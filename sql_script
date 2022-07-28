@@ -1,0 +1,66 @@
+DROP TABLE main CASCADE;
+
+CREATE TABLE main (
+	animal_name VARCHAR, 
+	animal_gender VARCHAR,
+	animal_birth_year INT, 
+	breed_name VARCHAR, 
+	zipcode INT, 
+	license_issue_date DATE, 
+	license_expired_date DATE, 
+	extract_year INT
+);
+
+-- explore name responses to see what needs to be filtered out
+SELECT DISTINCT animal_name
+FROM main
+ORDER BY animal_name;
+
+-- get only pets that have a name provided
+SELECT * 
+INTO pet_names
+FROM main
+WHERE animal_name NOT IN ('UNKNOWN', 'NAME NOT PROVIDED', 'NONE', '.', '...','N/A', '2', '3010271', '40804', '90201')
+;
+
+-- determine how many total pets there are with name provided
+SELECT COUNT(*) AS total
+FROM pet_names
+;
+
+-- determine number of pets with each unique name
+SELECT
+  animal_name,
+  COUNT(*) AS total_pets
+FROM pet_names
+GROUP BY animal_name
+ORDER BY total_pets DESC
+;
+
+-- top 5 most popular names by year
+SELECT animal_name, extract_year, COUNT(animal_name) AS name_count
+INTO name_counts
+FROM pet_names
+GROUP BY extract_year, animal_name
+ORDER BY extract_year, name_count DESC;
+
+SELECT * INTO yearly_top5 FROM (
+	SELECT animal_name, 
+		extract_year, 
+		name_count, 
+		ROW_NUMBER() OVER (PARTITION BY extract_year ORDER BY name_count DESC) as name_rank
+	FROM name_counts) ranks
+WHERE name_rank <= 5
+;
+
+-- are there any male Bellas?
+SELECT 
+	animal_gender,
+	COUNT(animal_gender)
+FROM pet_names
+WHERE animal_name = 'BELLA'
+GROUP BY animal_gender
+;
+
+	
+	
